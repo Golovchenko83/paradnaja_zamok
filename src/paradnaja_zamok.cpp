@@ -211,9 +211,10 @@ void loop()
         ESP.wdtFeed();                   // Пинок :) "watchdog"
         if (client.connect(name_client)) // имя на сервере mqtt
         {
-          client.subscribe(mqtt_reset);  // подписались на топик "ESP8_test_reset"
-          client.subscribe(name_client); // подписались на топик
-                                         // client.subscribe("temp_zapad");
+          client.subscribe(mqtt_reset);    // подписались на топик "ESP8_test_reset"
+          client.subscribe(name_client);   // подписались на топик
+          client.subscribe("telegram_sl"); // подписались на топик
+                                           // client.subscribe("temp_zapad");
           // Отправка IP в mqtt
           char IP_ch[20];
           String IP = (WiFi.localIP().toString().c_str());
