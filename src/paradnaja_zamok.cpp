@@ -38,14 +38,6 @@ void callback(char *topic, byte *payload, unsigned int length) // Функция
     temper_ulica = atof(s.c_str()); // переводим данные в float
   }
 
-  if ((String(topic)) == "masterskaja_ven_manual")
-  {
-    // state = atof(s.c_str()); // переводим данные в float
-    // set_manual.reset();
-    // set_manual.start();
-    //  manual = 1;
-  }
-
   int data = atoi(s.c_str()); // переводим данные в int
   // float data_f = atof(s.c_str()); //переводим данные в float
   if ((String(topic)) == mqtt_reset && data == 1)
@@ -55,13 +47,26 @@ void callback(char *topic, byte *payload, unsigned int length) // Функция
 
   if ((String(topic)) == name_client && data == 1)
   {
-    digitalWrite(D7, HIGH);
-    state = 1;
-  }
-  if ((String(topic)) == name_client && data == 0)
-  {
-    digitalWrite(D7, LOW);
-    state = 0;
+    digitalWrite(D2, LOW);
+    client.publish("zwonok_paradnaja", "1");
+    tone(D8, 300, 100);
+    delay(100);
+    tone(D8, 1000, 100);
+    delay(100);
+    tone(D8, 2000, 100);
+    delay(100);
+    tone(D8, 500, 100);
+    delay(100);
+    tone(D8, 600, 100);
+    delay(100);
+    tone(D8, 700, 100);
+    ESP.wdtFeed();
+    delay(5000);
+    digitalWrite(D2, HIGH);
+    tone(D8, 2000, 100);
+    delay(100);
+    tone(D8, 200, 100);
+    client.publish("zwonok-paradnaja", "0", 1);
   }
 }
 
@@ -88,7 +93,7 @@ void publish_send(const char *top, float &ex_data) // Отправка Пока�
 
 void loop()
 {
-///////////////////1//////////////////////
+  ///////////////////1//////////////////////
   if (!digitalRead(D7) && b1 == 0)
   {
     key.start();
@@ -101,7 +106,7 @@ void loop()
   {
     b1 = 0;
   }
-//////////////////2///////////////////////
+  //////////////////2///////////////////////
   if (!digitalRead(D6) && b2 == 0)
   {
     key.start();
@@ -114,7 +119,7 @@ void loop()
   {
     b2 = 0;
   }
-///////////////////3//////////////////////
+  ///////////////////3//////////////////////
   if (!digitalRead(D5) && b3 == 0)
   {
     key.start();
@@ -128,9 +133,8 @@ void loop()
     b3 = 0;
   }
 
-
-/////////////////////////////////////////////////////////////
-    if (!digitalRead(D1))
+  /////////////////////////////////////////////////////////////
+  if (!digitalRead(D1))
   {
     tone(D8, 1000, 500);
     digitalWrite(D2, LOW);
@@ -141,11 +145,12 @@ void loop()
     tone(D8, 300, 500);
     digitalWrite(D2, HIGH);
   }
- 
+
   ///////////////////////////////////////////////
   if (key1 == 2 && key2 == 1 && key3 == 4 && key.tick())
   {
     digitalWrite(D2, LOW);
+    client.publish("zwonok_paradnaja", "1");
     tone(D8, 300, 100);
     delay(100);
     tone(D8, 1000, 100);
@@ -166,15 +171,16 @@ void loop()
     key1 = 0;
     key2 = 0;
     key3 = 0;
-    Serial.println(key1);
+    client.publish("zwonok-paradnaja", "0", 1);
   }
   else if (key.tick())
   {
+    client.publish("zwonok_paradnaja", "1");
     tone(D8, 1000, 1000);
     key1 = 0;
     key2 = 0;
     key3 = 0;
-    Serial.println(key1);
+    client.publish("zwonok-paradnaja", "0", 1);
   }
 
   ESP.wdtFeed();
@@ -216,7 +222,7 @@ void setup()
   Serial.begin(9600);
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-  ESP.wdtDisable(); // Активация watchdog
+  ESP.wdtDisable();   // Активация watchdog
   pinMode(D1, INPUT); // Внутренняя кнопка
   pinMode(D5, INPUT); // 1
   pinMode(D6, INPUT); // 1
