@@ -33,11 +33,6 @@ void callback(char *topic, byte *payload, unsigned int length) // Функция
     s = s + ((char)payload[i]); // переводим данные в String
   }
 
-  if ((String(topic)) == "temp_zapad")
-  {
-    temper_ulica = atof(s.c_str()); // переводим данные в float
-  }
-
   int data = atoi(s.c_str()); // переводим данные в int
   // float data_f = atof(s.c_str()); //переводим данные в float
   if ((String(topic)) == mqtt_reset && data == 1)
@@ -48,7 +43,7 @@ void callback(char *topic, byte *payload, unsigned int length) // Функция
   if ((String(topic)) == name_client && data == 1)
   {
     digitalWrite(D2, LOW);
-    client.publish("zwonok_paradnaja", "1");
+    client.publish("zvonok", "1", 1);
     tone(D8, 300, 100);
     delay(100);
     tone(D8, 1000, 100);
@@ -66,7 +61,28 @@ void callback(char *topic, byte *payload, unsigned int length) // Функция
     tone(D8, 2000, 100);
     delay(100);
     tone(D8, 200, 100);
-    client.publish("zwonok-paradnaja", "0", 1);
+  }
+
+  if ((String(topic)) == "telegram_sl" && data == 1)
+  {
+    digitalWrite(D2, LOW);
+    tone(D8, 300, 100);
+    delay(100);
+    tone(D8, 1000, 100);
+    delay(100);
+    tone(D8, 2000, 100);
+    delay(100);
+    tone(D8, 500, 100);
+    delay(100);
+    tone(D8, 600, 100);
+    delay(100);
+    tone(D8, 700, 100);
+    ESP.wdtFeed();
+    delay(5000);
+    digitalWrite(D2, HIGH);
+    tone(D8, 2000, 100);
+    delay(100);
+    tone(D8, 200, 100);
   }
 }
 
@@ -150,7 +166,7 @@ void loop()
   if (key1 == 2 && key2 == 1 && key3 == 4 && key.tick())
   {
     digitalWrite(D2, LOW);
-    client.publish("zwonok_paradnaja", "1");
+    client.publish("zvonok", "1", 1);
     tone(D8, 300, 100);
     delay(100);
     tone(D8, 1000, 100);
@@ -171,16 +187,15 @@ void loop()
     key1 = 0;
     key2 = 0;
     key3 = 0;
-    client.publish("zwonok-paradnaja", "0", 1);
+    // client.publish("zvonok", "0", 1);
   }
   else if (key.tick())
   {
-    client.publish("zwonok_paradnaja", "1");
+    client.publish("zwonok_paradnaja", "1", 1);
     tone(D8, 1000, 1000);
     key1 = 0;
     key2 = 0;
     key3 = 0;
-    client.publish("zwonok-paradnaja", "0", 1);
   }
 
   ESP.wdtFeed();
